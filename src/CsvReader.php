@@ -2,6 +2,11 @@
 
 final class CsvReader
 {
+
+    /**
+     * @param $filename
+     * @return array[]
+     */
     public static function fromFile($filename): Array
     {
         $csv = file($filename);
@@ -11,20 +16,33 @@ final class CsvReader
             $lines[] = str_getcsv($line);
         }
 
-        return $lines;
+        $appliedRules = self::ApplyRules(array_slice($lines, 1));
+        self::ApplyDateDiscontinued($appliedRules["lines"]);
+
+        return $appliedRules;
     }
 
-    public static function ApplyRules($csvLines): Array
+    /**
+     * @param $csvLines
+     * @return array[]
+     *
+     * if price isn't readable delete line
+     * if quantity < 100 & cost < 5 remove line
+     * if cost > 1000 remove line
+     */
+    private static function ApplyRules($csvLines): Array
     {
-        // if quantity < 100 & cost < 5 remove line
-        // if cost > 1000 remove line
-        // if discontinued mark discontinued date as todays date
-
         $lines = [];
         $invalidLines = [];
 
         foreach ($csvLines as $line) {
             $quantity = (int) $line[3];
+
+            if (!is_numeric($line[4])) {
+                $invalidLines[] = $line;
+                continue;
+            }
+
             $cost = (int) $line[4];
 
             if ($cost < 5 && $quantity < 10 || $cost > 1000) {
@@ -35,10 +53,22 @@ final class CsvReader
             $lines[] = $line;
         }
 
-        // return both arrays as we need to report any removed lines.
         return [
             "lines" => $lines,
             "invalid" => $invalidLines,
         ];
+    }
+
+    /**
+     * @param $lines
+     *
+     * if discontinued mark discontinued date as today's date
+     */
+    private static function ApplyDateDiscontinued(&$lines) {
+        foreach ($lines as &$line) {
+            $discontinued = strtolower($line[5]);
+
+            $line[5] = $discontinued === "yes" ? (new DateTime())->format(DateTime::ATOM) : NULL;
+        }
     }
 }
