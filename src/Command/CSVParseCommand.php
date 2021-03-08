@@ -2,13 +2,16 @@
 
 namespace App\Command;
 
-use App\StockEntry;
+use App\DatabaseWriter;
 use App\StockEntryValidator;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use App\CsvParser;
+
+use function file_get_contents;
+use function implode;
 
 class CSVParseCommand extends Command
 {
@@ -60,6 +63,8 @@ class CSVParseCommand extends Command
             $output->writeln("Valid entries");
             $this->outputLines($output, $validLines);
         }
+
+        DatabaseWriter::writeToDatabase($validLines);
 
         $output->writeln("Invalid entries");
         $this->outputLines($output, $invalidLines);

@@ -31,6 +31,6 @@ final class CsvParser
      */
     public function parse(string $csv): array
     {
-        return $this->serializer->deserialize($csv, "App\\StockEntry[]", "csv");
+        return $this->serializer->deserialize($csv, StockEntry::class . "[]", "csv");
     }
 }

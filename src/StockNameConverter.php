@@ -6,6 +6,8 @@ namespace App;
 
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
+use function array_search;
+
 final class StockNameConverter implements NameConverterInterface
 {
 
