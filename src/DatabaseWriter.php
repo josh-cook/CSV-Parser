@@ -3,8 +3,8 @@
 namespace App;
 
 use DateTime;
-use function strtolower;
 use mysqli;
+use function strtolower;
 
 final class DatabaseWriter
 {
